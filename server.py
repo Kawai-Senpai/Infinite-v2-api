@@ -18,6 +18,10 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+app.include_router(agent_route.router, prefix="/agent", tags=["agent"])
+app.include_router(chat_route.router, prefix="/chat", tags=["chat"])
+app.include_router(session_route.router, prefix="/session", tags=["session"])
+
 @app.get("/protected")
 @clerk_auth()
 async def protected_route(user=None, request: Request = None):  # Add default value to user
@@ -44,10 +48,6 @@ async def status(request: Request):
             "mongodb": "down",
             "error": str(e)
         }
-
-app.include_router(agent_route.router, prefix="/agent", tags=["agent"])
-app.include_router(chat_route.router, prefix="/chat", tags=["chat"])
-app.include_router(session_route.router, prefix="/session", tags=["session"])
 
 if __name__ == "__main__":
     uvicorn.run("server:app", host="localhost", port=9000, reload=True)
