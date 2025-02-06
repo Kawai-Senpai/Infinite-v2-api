@@ -1,11 +1,11 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from functools import wraps
 from database.mongo import pingtest as mongo_pingtest
 from datetime import datetime, timezone
 from errors.error_logger import log_exception_with_request
 import uvicorn
 from routers.auth_route import clerk_auth
+from routers import agent_route, chat_route, session_route
 
 app = FastAPI()
 
@@ -18,10 +18,6 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-@app.get("/")
-async def read_root():
-    return {"message": "Hello, Clerk!"}
-
 @app.get("/protected")
 @clerk_auth()
 async def protected_route(user=None, request: Request = None):  # Add default value to user
@@ -29,6 +25,7 @@ async def protected_route(user=None, request: Request = None):  # Add default va
     return {"message": f"Hello, {user_id}"}
 
 @app.get("/status")
+@app.get("/")
 async def status(request: Request):
     try:
         mongo_status = "up" if mongo_pingtest() else "down"
@@ -47,6 +44,10 @@ async def status(request: Request):
             "mongodb": "down",
             "error": str(e)
         }
+
+app.include_router(agent_route.router, prefix="/agent", tags=["agent"])
+app.include_router(chat_route.router, prefix="/chat", tags=["chat"])
+app.include_router(session_route.router, prefix="/session", tags=["session"])
 
 if __name__ == "__main__":
     uvicorn.run("server:app", host="localhost", port=9000, reload=True)

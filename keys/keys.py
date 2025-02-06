@@ -13,6 +13,9 @@ load_dotenv(dotenv_file)
 #* MongoDB Connection ----------------------------------------
 mongo_uri = os.getenv("MONGO_URI")
 
+#* Service URLs ---------------------------------------------
+aiml_service_url = os.getenv("AIML_SERVICE_URL", "http://localhost:8000")
+
 #! Keys -----------------------------------------------------
 #* Aws keys -------------------------------------------------
 aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID")
