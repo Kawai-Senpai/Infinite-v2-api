@@ -361,3 +361,53 @@ Authorization: Bearer <your_jwt_token>
         "message": "Failed to retrieve available tools.",
         "error": "string"  // Error message.
     }
+    ```
+
+### 10. Update Agent
+
+*   **URL:** `/agents/update/{agent_id}`
+*   **Method:** `PUT`
+*   **Description:** Updates an existing agent's details. Has special restrictions on type changes:
+    - System agents cannot be modified
+    - Cannot change any agent to type "system" or "approved"
+    - Can only change public/approved agents to "private"
+
+    **Headers:**
+    *   `Authorization`: Required. JWT token for authentication.
+
+    **Path Parameters:**
+    *   `agent_id` (string): Required. The ID of the agent to update.
+
+    **Request Body (JSON):**
+    ```json
+    {
+        "name": "string",         // Optional. New name for the agent
+        "role": "string",         // Optional. New role for the agent
+        "capabilities": [],       // Optional. New array of capabilities
+        "rules": [],             // Optional. New array of rules
+        "agent_type": "string"   // Optional. New type (restrictions apply)
+    }
+    ```
+
+    **Response (Success):**
+    ```json
+    {
+        "message": "Agent updated successfully.",
+        "success": true
+    }
+    ```
+
+    **Response (Error):**
+    ```json
+    {
+        "message": "Failed to update agent.",
+        "error": "string"  // Error message detailing why the update failed
+    }
+    ```
+
+    **Possible Error Messages:**
+    - "System agents cannot be modified."
+    - "Cannot change agent type to system or approved."
+    - "Can only change agent type to private."
+    - "Not authorized to update this agent."
+    - "Agent not found."
