@@ -1,11 +1,11 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from database.mongo import pingtest as mongo_pingtest
 from datetime import datetime, timezone
 from errors.error_logger import log_exception_with_request
 import uvicorn
-from routers.auth_route import clerk_auth
 from routers import agent_route, chat_route, session_route
+from dependencies.auth import get_current_user  # Add this import
 
 app = FastAPI()
 
@@ -18,13 +18,15 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-app.include_router(agent_route.router, prefix="/agent", tags=["agent"])
+# Change from '/agent' to '/agents' to match the other server's expectation
+app.include_router(agent_route.router, prefix="/agents", tags=["agent"])
 app.include_router(chat_route.router, prefix="/chat", tags=["chat"])
-app.include_router(session_route.router, prefix="/session", tags=["session"])
+app.include_router(session_route.router, prefix="/sessions", tags=["session"])
 
 @app.get("/protected")
-@clerk_auth()
-async def protected_route(user=None, request: Request = None):  # Add default value to user
+async def protected_route(
+    user: dict = Depends(get_current_user)  # Use the new dependency
+):
     user_id = user.get("sub")
     return {"message": f"Hello, {user_id}"}
 
@@ -50,4 +52,4 @@ async def status(request: Request):
         }
 
 if __name__ == "__main__":
-    uvicorn.run("server:app", host="localhost", port=9000, reload=True)
+    uvicorn.run("_server:app", host="localhost", port=9000, reload=True)
