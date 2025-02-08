@@ -26,11 +26,14 @@ async def chat(
     }
     
     if stream:
-        async with httpx.AsyncClient() as client:
-            response = await client.stream('POST', url, params={**params, "user_id": user_id}, json=body)
-            return StreamingResponse(
-                response.aiter_bytes(),
-                media_type='text/event-stream'
-            )
+        async def stream_bytes():
+            async with httpx.AsyncClient() as client:
+                async with client.stream('POST', url, params={**params, "user_id": user_id}, json=body) as response:
+                    async for chunk in response.aiter_bytes():
+                        yield chunk
+        return StreamingResponse(
+            stream_bytes(),
+            media_type='text/event-stream'
+        )
     else:
         return await forward_request('post', url, user_id=user_id, params=params, json=body)

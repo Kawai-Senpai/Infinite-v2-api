@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException, Request, Body, Query, Depends
 from fastapi.responses import JSONResponse
-import httpx
 from keys.keys import aiml_service_url
 from dependencies.auth import get_current_user
 from utilities.forward import forward_request
