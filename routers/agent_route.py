@@ -30,10 +30,12 @@ async def get_public_agents(
     request: Request = None,
     limit: int = 20,
     skip: int = 0,
+    sort_by: str = Query("created_at"),
+    sort_order: int = Query(-1),
     user: dict = Depends(get_current_user)
 ):
     return await forward_request('get', f"{aiml_service_url}/agents/get_public",
-        params={'limit': limit, 'skip': skip}
+        params={'limit': limit, 'skip': skip, 'sort_by': sort_by, 'sort_order': sort_order}
     )
 
 @router.delete("/delete/{agent_id}")
@@ -52,10 +54,12 @@ async def get_approved_agents(
     request: Request = None,
     limit: int = 20,
     skip: int = 0,
+    sort_by: str = Query("created_at"),
+    sort_order: int = Query(-1),
     user: dict = Depends(get_current_user)
 ):
     return await forward_request('get', f"{aiml_service_url}/agents/get_approved",
-        params={'limit': limit, 'skip': skip}
+        params={'limit': limit, 'skip': skip, 'sort_by': sort_by, 'sort_order': sort_order}
     )
 
 @router.get("/get_system")
@@ -63,10 +67,12 @@ async def get_system_agents(
     request: Request = None,
     limit: int = 20,
     skip: int = 0,
+    sort_by: str = Query("created_at"),
+    sort_order: int = Query(-1),
     user: dict = Depends(get_current_user)
 ):
     return await forward_request('get', f"{aiml_service_url}/agents/get_system",
-        params={'limit': limit, 'skip': skip}
+        params={'limit': limit, 'skip': skip, 'sort_by': sort_by, 'sort_order': sort_order}
     )
 
 @router.get("/get_user_agents/{user_id}")
@@ -88,12 +94,14 @@ async def get_private_agents(
     request: Request = None,
     limit: int = 20,
     skip: int = 0,
+    sort_by: str = Query("created_at"),
+    sort_order: int = Query(-1),
     user: dict = Depends(get_current_user)
 ):
     user_id = user.get("sub")
     return await forward_request('get', f"{aiml_service_url}/agents/get_user/{user_id}",
-        params={'limit': limit, 'skip': skip, 'sort_by': 'created_at', 'sort_order': -1},
-        user_id=user.get("sub")
+        params={'limit': limit, 'skip': skip, 'sort_by': sort_by, 'sort_order': sort_order},
+        user_id=user_id
     )
 
 @router.get("/get/{agent_id}")

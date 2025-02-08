@@ -119,11 +119,14 @@ async def list_agent_sessions(
 async def get_session_details(
     request: Request,
     session_id: str,
+    limit: int = 20,
+    skip: int = 0,
     user: dict = Depends(get_current_user)
 ):
     user_id = user.get("sub")
     return await forward_request(
         'get',
         f"{aiml_service_url}/sessions/get/{session_id}",
-        user_id=user_id
+        user_id=user_id,
+        params={'limit': limit, 'skip': skip}
     )
