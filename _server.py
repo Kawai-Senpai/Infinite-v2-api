@@ -6,6 +6,7 @@ from errors.error_logger import log_exception_with_request
 import uvicorn
 from routers import agent_route, chat_route, session_route
 from dependencies.auth import get_current_user  # Add this import
+from keys.keys import environment
 
 app = FastAPI()
 
@@ -51,5 +52,5 @@ async def status(request: Request):
             "error": str(e)
         }
 
-if __name__ == "__main__":
+if __name__ == "__main__" and environment == "development":
     uvicorn.run("_server:app", host="localhost", port=9000, reload=True)
