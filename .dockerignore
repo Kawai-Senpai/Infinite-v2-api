@@ -1,2 +1,6 @@
 .testdata
 doc
+.env
+.env.development
+.env.production
+.env.testing
