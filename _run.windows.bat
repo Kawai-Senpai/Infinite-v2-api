@@ -1,1 +1,1 @@
-docker run -p 8000:8000 --add-host=host.docker.internal:host-gateway infinite-api
+docker run -p 9000:9000 --add-host=host.docker.internal:host-gateway infinite-api
