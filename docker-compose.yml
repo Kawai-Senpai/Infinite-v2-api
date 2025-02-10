@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  infinite-aiml:
+    image: kawaisenpai/infinite-aiml:latest
+    container_name: infinite-aiml
+    environment:
+      - ENVIRONMENT=production
+    env_file:
+      - ./aiml-env/.env.production
+    network_mode: host
+    restart: always
+
+  infinite-api:
+    image: kawaisenpai/infinite-api:latest
+    container_name: infinite-api
+    environment:
+      - ENVIRONMENT=production
+    env_file:
+      - ./api-env/.env.production
+    network_mode: host
+    restart: always
