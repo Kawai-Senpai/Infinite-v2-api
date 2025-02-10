@@ -95,7 +95,7 @@ async def get_user_agents(
         params={'limit': limit, 'skip': skip, 'sort_by': sort_by, 'sort_order': sort_order}
     )
 
-@router.get("/get_private")
+@router.get("/get_own")
 async def get_private_agents(
     request: Request = None,
     limit: int = 20,

@@ -255,11 +255,11 @@ Authorization: Bearer <your_jwt_token>
     }
     ```
 
-### 7. Get Private Agents
+### 7. Get Own Agents
 
-*   **URL:** `/agents/get_private`
+*   **URL:** `/agents/get_own`
 *   **Method:** `GET`
-*   **Description:** Retrieves a list of private agents for the authenticated user.
+*   **Description:** Retrieves a list of own agents for the authenticated user.
 
     **Headers:**
     *   `Authorization`: Required. JWT token for authentication.
