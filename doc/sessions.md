@@ -171,10 +171,9 @@ Authorization: Bearer <your_jwt_token>
 
 ### 6. List User Sessions
 
-*   **Endpoint:** `GET /get_all/{user_id}`
-*   **Description:** Retrieves all chat sessions for a specific user.
+*   **Endpoint:** `GET /get_all`
+*   **Description:** Retrieves all chat sessions for the authenticated user.
 *   **Request Parameters:**
-    *   `user_id` (required): The ID of the user. String. Passed as a path parameter.
     *   `limit` (optional): The maximum number of sessions to retrieve. Integer. Default is `20`.
     *   `skip` (optional): The number of sessions to skip. Integer. Default is `0`.
     *   `sort_by` (optional): The field to sort the sessions by. String. Default is `"created_at"`.
@@ -185,7 +184,7 @@ Authorization: Bearer <your_jwt_token>
 *   **Example Request:**
 
     ```
-    GET /get_all/user123?limit=30&sort_by=last_active&sort_order=1
+    GET /get_all?limit=30&sort_by=last_active&sort_order=1
     Authorization: Bearer <your_jwt_token>
     ```
 *   **Response:**

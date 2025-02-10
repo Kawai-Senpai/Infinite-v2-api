@@ -81,16 +81,16 @@ async def get_recent_history(
         params={'limit': limit, 'skip': skip}
     )
 
-@router.get("/get_all/{user_id}")
+@router.get("/get_all")
 async def list_user_sessions(
     request: Request,
-    user_id: str,
     limit: int = 20,
     skip: int = 0,
     sort_by: str = "created_at",
     sort_order: int = -1,
     user: dict = Depends(get_current_user)
 ):
+    user_id = user.get("sub")
     return await forward_request(
         'get',
         f"{aiml_service_url}/sessions/get_all/{user_id}",
