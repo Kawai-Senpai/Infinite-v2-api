@@ -14,9 +14,6 @@ RUN rm -rf /app/debug/* /app/cache/*
 RUN mkdir -p /app/debug
 VOLUME ["/app/debug"]
 
-#run _init.py to create folders and structures
-#RUN python _init.py
-
 EXPOSE 9000
 
-CMD ["uvicorn", "_server:app", "--host", "0.0.0.0", "--port", "9000"]
+CMD ["sh", "-c", "python _init.py && uvicorn _server:app --host 0.0.0.0 --port 9000 --workers 4"]
