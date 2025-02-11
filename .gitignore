@@ -8,6 +8,8 @@ cache/*
 .testdata
 __pycache__
 infinite-v2-aiml.code-workspace
+_auto_git_summary.bat
+reports/*
 
 #! Don't ignore
 !debug/Readme.md

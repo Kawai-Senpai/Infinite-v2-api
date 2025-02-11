@@ -4,3 +4,5 @@ doc
 .env.development
 .env.production
 .env.testing
+_auto_git_summary.bat
+reports/*
