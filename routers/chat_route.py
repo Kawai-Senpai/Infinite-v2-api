@@ -15,6 +15,7 @@ async def chat(
     body: dict = Body(...),
     stream: bool = False,
     use_rag: bool = True,
+    include_rich_response: bool = True,
     user: dict = Depends(get_current_user)
 ):
     user_id = user.get("sub")
@@ -22,7 +23,8 @@ async def chat(
     params = {
         'agent_id': agent_id,
         'stream': stream,
-        'use_rag': use_rag
+        'use_rag': use_rag,
+        'include_rich_response': include_rich_response
     }
     
     if stream:

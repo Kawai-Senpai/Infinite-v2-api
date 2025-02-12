@@ -21,6 +21,7 @@ This endpoint allows users to interact with an AI agent by sending messages and 
 -   `agent_id` (required): The identifier of the AI agent to be used for the chat.
 -   `stream` (optional, default: `False`): A boolean value indicating whether to use streaming mode. If `True`, the response will be streamed as `text/event-stream`.
 -   `use_rag` (optional, default: `True`): A boolean value indicating whether to use Retrieval-Augmented Generation (RAG).
+-   `include_rich_response` (optional, default: `True`): A boolean value indicating whether to include additional metadata (tool results, tools used, tools not used, and memories used) in the response.
 -   `user_id` (required): The identifier of the user.
 
 ### Headers
@@ -71,10 +72,16 @@ curl -X POST \
 
 ### Success (Non-Streaming)
 
+When `include_rich_response` is enabled, the JSON response includes additional metadata keys:
+
 ```json
 {
     "message": "Chat completed successfully.",
-    "response": "The capital of France is Paris."
+    "response": "The capital of France is Paris.",
+    "tool_results": [ ... ],
+    "tools_used": [ ... ],
+    "tools_not_used": [ ... ],
+    "memories_used": [ ... ]
 }
 ```
 
