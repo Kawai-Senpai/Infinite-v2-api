@@ -37,15 +37,15 @@ async def status(request: Request):
     try:
         mongo_status = "up" if mongo_pingtest() else "down"
         return {
-            "message": "Service status retrieved successfully.",
+            "message": "Service status retrieved successfully. All systems are operational. If you encounter any issues, please contact Ranit at https://github.com/Kawai-Senpai",
             "server": "API",
             "time": datetime.now(timezone.utc).isoformat() + "Z",
-            "mongodb": mongo_status
+            "mongodb": mongo_status,
         }
     except Exception as e:
         log_exception_with_request(e, status, request)
         return {
-            "message": "Service status retrieval encountered an error.",
+            "message": "Service status retrieval encountered an error please contact Ranit at https://github.com/Kawai-Senpai",
             "server": "API",
             "time": datetime.now(timezone.utc).isoformat() + "Z",
             "mongodb": "down",
