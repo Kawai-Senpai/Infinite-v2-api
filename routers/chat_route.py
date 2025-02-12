@@ -27,7 +27,7 @@ async def chat(
     
     if stream:
         async def stream_bytes():
-            async with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient(timeout=None) as client:  # Disable timeouts
                 async with client.stream('POST', url, params={**params, "user_id": user_id}, json=body) as response:
                     async for chunk in response.aiter_bytes():
                         yield chunk
