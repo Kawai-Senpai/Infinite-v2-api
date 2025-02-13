@@ -162,7 +162,7 @@ Retrieves all collections for an agent. Each agent has one or more collections i
 ```
 
 ### List Collection Files
-`GET /files/collections/files/{agent_id}/{collection_id}`
+`GET /files/collections/files/{agent_id}/{collection_index}`
 
 Retrieves all files in a specific collection.
 
@@ -226,6 +226,50 @@ Possible status values:
 - `processing`: Job is currently being processed
 - `completed`: Job finished successfully
 - `failed`: Job failed with error
+
+### Get File Details
+`GET /files/file/{file_id}`
+
+Retrieves detailed information about a specific file.
+
+#### Path Parameters
+- `file_id` (required): ID of the file to get details for
+
+#### Response
+```json
+{
+    "_id": "file123",
+    "agent_id": "agent123",
+    "filename": "example.pdf",
+    "file_type": "pdf",
+    "uploaded_at": "2024-01-01T00:00:00Z",
+    "collection_id": "collection123",
+    "s3_bucket": "infinite-v2-data",
+    "s3_key": "files/user123/example.pdf",
+    "file_hash": "md5hash",
+    "chunk_ids": ["chunk1", "chunk2"]
+}
+```
+
+For webpage type files:
+```json
+{
+    "_id": "file123",
+    "agent_id": "agent123",
+    "filename": "Example Page",
+    "file_type": "webpage",
+    "uploaded_at": "2024-01-01T00:00:00Z",
+    "collection_id": "collection123",
+    "url": "https://example.com",
+    "file_hash": "md5hash",
+    "chunk_ids": ["chunk1", "chunk2"]
+}
+```
+
+#### Error Responses
+- 404: File not found
+- 403: Not authorized to access this file
+- 500: Internal server error
 
 ## Error Handling
 

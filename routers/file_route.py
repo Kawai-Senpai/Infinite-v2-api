@@ -110,7 +110,7 @@ async def get_download_url(
 ):
     """Generate a download URL for a file"""
     try:
-        # Get file details from AIML service
+        # Get file details using the correct endpoint
         file_details = await forward_request(
             'get',
             f"{aiml_service_url}/files/files/get/{file_id}",
@@ -143,9 +143,9 @@ async def delete_file(
     file_id: str,
     user: dict = Depends(get_current_user)
 ):
-    """Delete a file and its associated chunks with better error handling"""
+    """Delete a file and its associated chunks"""
     try:
-        # First get file details
+        # Get file details using the correct endpoint
         file_details = await forward_request(
             'get',
             f"{aiml_service_url}/files/files/get/{file_id}",
@@ -153,12 +153,15 @@ async def delete_file(
         )
         
         errors = []
+        agent_id = file_details.get("agent_id")
+        if not agent_id:
+            raise HTTPException(status_code=400, detail="Missing agent_id in file details.")
         
-        # Delete from AIML service first (this will handle chunk deletion)
+        # Delete from AIML service using the correct deletion route
         try:
             await forward_request(
                 'delete',
-                f"{aiml_service_url}/files/delete/{file_id}",
+                f"{aiml_service_url}/files/{agent_id}/{file_id}",
                 params={'user_id': user.get('sub')}
             )
         except Exception as e:
@@ -307,4 +310,21 @@ async def get_job_status(
         )
     except Exception as e:
         log_exception_with_request(e, get_job_status, request)
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/file/{file_id}")
+async def get_file_details(
+    request: Request,
+    file_id: str,
+    user: dict = Depends(get_current_user)
+):
+    """Get detailed information about a specific file"""
+    try:
+        return await forward_request(
+            'get',
+            f"{aiml_service_url}/files/files/get/{file_id}",
+            params={'user_id': user.get('sub')}
+        )
+    except Exception as e:
+        log_exception_with_request(e, get_file_details, request)
         raise HTTPException(status_code=500, detail=str(e))
