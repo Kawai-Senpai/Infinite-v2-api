@@ -10,5 +10,12 @@
             "ai": ["agents", "files", "sessions", "memory"],
             "logs": ["error"]
         }
+    },
+    "caching": {
+        "dir": "cache"
+    },
+    "aws": {
+        "region": "us-east-1",
+        "bucket": "infinite-bucket"
     }
 }
