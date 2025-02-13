@@ -4,6 +4,7 @@ from keys.keys import aiml_service_url
 from utilities.forward import forward_request
 from utilities.s3_loader import generate_download_link, generate_unique_filename, generate_upload_url
 import boto3
+from errors.error_logger import log_exception_with_request   # <-- new import
 
 router = APIRouter()
 
@@ -26,7 +27,6 @@ async def generate_upload_url_endpoint(
     agent_id: str = Query(...),
     user: dict = Depends(get_current_user)
 ):
-    """Generate a pre-signed URL for file upload to S3 with validations"""
     try:
         # Validate file type
         if file_type not in ALLOWED_FILE_TYPES:
@@ -61,6 +61,7 @@ async def generate_upload_url_endpoint(
     except HTTPException:
         raise
     except Exception as e:
+        log_exception_with_request(e, generate_upload_url_endpoint, request)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/process")
@@ -98,6 +99,7 @@ async def process_file(
         
         return response
     except Exception as e:
+        log_exception_with_request(e, process_file, request)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/download/{file_id}")
@@ -132,6 +134,7 @@ async def get_download_url(
             "download_url": download_url
         }
     except Exception as e:
+        log_exception_with_request(e, get_download_url, request)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.delete("/delete/{file_id}")
@@ -180,6 +183,7 @@ async def delete_file(
         
         return {"message": "File deleted successfully"}
     except Exception as e:
+        log_exception_with_request(e, delete_file, request)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/files/{agent_id}")
@@ -191,15 +195,19 @@ async def get_agent_files(
     user: dict = Depends(get_current_user)
 ):
     """Get all files for an agent"""
-    return await forward_request(
-        'get',
-        f"{aiml_service_url}/files/files/all/{agent_id}",
-        params={
-            'user_id': user.get('sub'),
-            'limit': limit,
-            'skip': skip
-        }
-    )
+    try:
+        return await forward_request(
+            'get',
+            f"{aiml_service_url}/files/files/all/{agent_id}",
+            params={
+                'user_id': user.get('sub'),
+                'limit': limit,
+                'skip': skip
+            }
+        )
+    except Exception as e:
+        log_exception_with_request(e, get_agent_files, request)
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/collections/{agent_id}")
 async def get_agent_collections(
@@ -208,11 +216,15 @@ async def get_agent_collections(
     user: dict = Depends(get_current_user)
 ):
     """Get all collections for an agent"""
-    return await forward_request(
-        'get',
-        f"{aiml_service_url}/files/collections/all/{agent_id}",
-        params={'user_id': user.get('sub')}
-    )
+    try:
+        return await forward_request(
+            'get',
+            f"{aiml_service_url}/files/collections/all/{agent_id}",
+            params={'user_id': user.get('sub')}
+        )
+    except Exception as e:
+        log_exception_with_request(e, get_agent_collections, request)
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/collections/files/{agent_id}/{collection_id}")
 async def get_collection_files(
@@ -224,15 +236,19 @@ async def get_collection_files(
     user: dict = Depends(get_current_user)
 ):
     """Get all files in a collection"""
-    return await forward_request(
-        'get',
-        f"{aiml_service_url}/files/collections/files/{agent_id}/{collection_id}",
-        params={
-            'user_id': user.get('sub'),
-            'limit': limit,
-            'skip': skip
-        }
-    )
+    try:
+        return await forward_request(
+            'get',
+            f"{aiml_service_url}/files/collections/files/{agent_id}/{collection_id}",
+            params={
+                'user_id': user.get('sub'),
+                'limit': limit,
+                'skip': skip
+            }
+        )
+    except Exception as e:
+        log_exception_with_request(e, get_collection_files, request)
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/validate")
 async def validate_file(
@@ -274,6 +290,7 @@ async def validate_file(
             "issues": issues
         }
     except Exception as e:
+        log_exception_with_request(e, validate_file, request)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/jobs/{job_id}")
@@ -289,4 +306,5 @@ async def get_job_status(
             f"{aiml_service_url}/files/jobs/get/{job_id}"
         )
     except Exception as e:
+        log_exception_with_request(e, get_job_status, request)
         raise HTTPException(status_code=500, detail=str(e))

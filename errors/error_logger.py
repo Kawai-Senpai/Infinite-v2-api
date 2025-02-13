@@ -28,7 +28,7 @@ def log_exception(exception, function):
         
         # Log to MongoDB
         error_entry = {
-            "api": "AIML",
+            "api": "API",
             "function": function_name,
             "exception": str(exception),
             "traceback": tb,
@@ -61,7 +61,7 @@ def log_exception_with_request(exception, function, request):
 
         # Log to MongoDB
         error_entry = {
-            "api": "AIML",
+            "api": "API",
             "function": function_name,
             "exception": str(exception),
             "traceback": tb,
