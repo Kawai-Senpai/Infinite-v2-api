@@ -4,7 +4,7 @@ from database.mongo import pingtest as mongo_pingtest
 from datetime import datetime, timezone
 from errors.error_logger import log_exception_with_request
 import uvicorn
-from routers import agent_route, chat_route, session_route
+from routers import agent_route, chat_route, session_route, file_route
 from dependencies.auth import get_current_user  # Add this import
 from keys.keys import environment
 
@@ -23,6 +23,7 @@ app.add_middleware(
 app.include_router(agent_route.router, prefix="/agents", tags=["agent"])
 app.include_router(chat_route.router, prefix="/chat", tags=["chat"])
 app.include_router(session_route.router, prefix="/sessions", tags=["session"])
+app.include_router(file_route.router, prefix="/files", tags=["files"])
 
 @app.get("/protected")
 async def protected_route(
