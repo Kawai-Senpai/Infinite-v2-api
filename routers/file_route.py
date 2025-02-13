@@ -69,6 +69,7 @@ async def process_file(
     s3_key: str = Query(...),
     file_name: str = Query(...),
     file_type: str = Query(...),
+    agent_id: str = Query(...),
     collection_index: int = Query(None),
     chunk_size: int = Query(3),
     overlap: int = Query(1),
@@ -84,6 +85,7 @@ async def process_file(
             params={
                 'file_name': file_name,
                 'file_type': file_type,
+                'agent_id': agent_id,
                 'collection_index': collection_index,
                 'chunk_size': chunk_size,
                 'overlap': overlap,
@@ -249,8 +251,9 @@ async def validate_file(
         if file_type not in ALLOWED_FILE_TYPES:
             issues.append(f"File type {file_type} not allowed")
         
-        # Check file size
-        if file_size > MAX_FILE_SIZE:
+        # Convert file_size from MB to bytes for validation
+        converted_size = file_size * 1024 * 1024
+        if converted_size > MAX_FILE_SIZE:
             issues.append(f"File size exceeds maximum limit of {MAX_FILE_SIZE/1024/1024}MB")
         
         # Check for duplicate

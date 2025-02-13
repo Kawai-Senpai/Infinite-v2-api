@@ -63,10 +63,11 @@ Generates a pre-signed S3 URL for file upload with validation checks.
 Initiates file processing after successful upload to S3.
 
 #### Query Parameters
+- `agent_id` (required): ID of the agent to associate the file with
 - `s3_key` (required): S3 key of the uploaded file
 - `file_name` (required): Original file name
 - `file_type` (required): File type
-- `collection_index` (optional): Index of the collection to store the file in
+- `collection_index` (required): Index of the collection to store the file in
 - `chunk_size` (optional, default: 3): Number of sentences per chunk
 - `overlap` (optional, default: 1): Number of overlapping sentences between chunks
 - `chunk_type` (optional, default: "sentence"): Chunking method ("sentence" or "character")
