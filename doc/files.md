@@ -67,7 +67,7 @@ Initiates file processing after successful upload to S3.
 - `s3_key` (required): S3 key of the uploaded file
 - `file_name` (required): Original file name
 - `file_type` (required): File type
-- `collection_index` (required): Index of the collection to store the file in
+- `collection_index` (required): Index of the collection to store the file in (0-based)
 - `chunk_size` (optional, default: 3): Number of sentences per chunk
 - `overlap` (optional, default: 1): Number of overlapping sentences between chunks
 - `chunk_type` (optional, default: "sentence"): Chunking method ("sentence" or "character")
@@ -146,7 +146,7 @@ Retrieves all files associated with an agent.
 ### List Collections
 `GET /files/collections/{agent_id}`
 
-Retrieves all collections for an agent.
+Retrieves all collections for an agent. Each agent has one or more collections indexed from 0.
 
 #### Response
 ```json

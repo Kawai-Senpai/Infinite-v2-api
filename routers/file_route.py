@@ -226,20 +226,20 @@ async def get_agent_collections(
         log_exception_with_request(e, get_agent_collections, request)
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/collections/files/{agent_id}/{collection_id}")
+@router.get("/collections/files/{agent_id}/{collection_index}")
 async def get_collection_files(
     request: Request,
     agent_id: str,
-    collection_id: str,
+    collection_index: int,  # Changed from collection_id to collection_index
     limit: int = 20,
     skip: int = 0,
     user: dict = Depends(get_current_user)
 ):
-    """Get all files in a collection"""
+    """Get all files in a collection using collection index"""
     try:
         return await forward_request(
             'get',
-            f"{aiml_service_url}/files/collections/files/{agent_id}/{collection_id}",
+            f"{aiml_service_url}/files/collections/files/{agent_id}/{collection_index}",
             params={
                 'user_id': user.get('sub'),
                 'limit': limit,
