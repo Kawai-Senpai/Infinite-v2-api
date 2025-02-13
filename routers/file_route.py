@@ -272,3 +272,18 @@ async def validate_file(
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/jobs/{job_id}")
+async def get_job_status(
+    request: Request,
+    job_id: str,
+    user: dict = Depends(get_current_user)
+):
+    """Get the status of a file processing job"""
+    try:
+        return await forward_request(
+            'get',
+            f"{aiml_service_url}/files/jobs/get/{job_id}"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

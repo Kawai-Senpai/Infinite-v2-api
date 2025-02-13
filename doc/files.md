@@ -203,6 +203,29 @@ Validates file metadata before upload.
 }
 ```
 
+### Get Job Status
+`GET /files/jobs/{job_id}`
+
+Retrieves the status of a file processing job.
+
+#### Path Parameters
+- `job_id` (required): ID of the processing job to check
+
+#### Response
+```json
+{
+    "message": "Job details retrieved successfully",
+    "data": {
+    }
+}
+```
+
+Possible status values:
+- `pending`: Job is queued
+- `processing`: Job is currently being processed
+- `completed`: Job finished successfully
+- `failed`: Job failed with error
+
 ## Error Handling
 
 All endpoints return appropriate HTTP status codes and error messages:
