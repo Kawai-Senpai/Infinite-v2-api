@@ -1,5 +1,6 @@
 import httpx
 from fastapi import HTTPException
+from json.decoder import JSONDecodeError  # new import
 
 async def forward_request(method: str, url: str, user_id: str = None, **kwargs):
     """
@@ -23,9 +24,13 @@ async def forward_request(method: str, url: str, user_id: str = None, **kwargs):
                 return {}
     except httpx.HTTPStatusError as e:
         # Propagate the status code and message from the AIML service
+        try:
+            detail = e.response.json()
+        except (JSONDecodeError, ValueError):
+            detail = e.response.text
         raise HTTPException(
             status_code=e.response.status_code,
-            detail=e.response.json()
+            detail=detail
         )
     except httpx.RequestError as e:
         # Network issues
