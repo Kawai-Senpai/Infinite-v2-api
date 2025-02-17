@@ -163,3 +163,76 @@ async def get_session_details(
     except Exception as e:
         log_exception_with_request(e, get_session_details, request)
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/team/create")
+async def create_team_session_route(
+    request: Request,
+    agent_ids: list = Body(...),
+    max_context_results: int = 1,
+    user: dict = Depends(get_current_user),
+    session_type: str = "team"
+):
+    try:
+        user_id = user.get("sub")
+        return await forward_request(
+            'post',
+            f"{aiml_service_url}/sessions/team/create",
+            user_id=user_id,
+            json={
+                "agent_ids": agent_ids,
+                "max_context_results": max_context_results,
+                "user_id": user_id,
+                "session_type": session_type
+            }
+        )
+    except Exception as e:
+        log_exception_with_request(e, create_team_session_route, request)
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/team/history/{session_id}")
+async def get_team_session_history_route(
+    request: Request,
+    session_id: str,
+    limit: int = 20,
+    skip: int = 0,
+    user: dict = Depends(get_current_user)
+):
+    try:
+        user_id = user.get("sub")
+        return await forward_request(
+            'get',
+            f"{aiml_service_url}/sessions/team/history/{session_id}",
+            user_id=user_id,
+            params={'limit': limit, 'skip': skip}
+        )
+    except Exception as e:
+        log_exception_with_request(e, get_team_session_history_route, request)
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/team/history/update/{session_id}")
+async def update_team_session_history_route(
+    request: Request,
+    session_id: str,
+    agent_id: str = Body(None),
+    role: str = Body(...),
+    content: str = Body(...),
+    summary: bool = False,
+    user: dict = Depends(get_current_user)
+):
+    try:
+        user_id = user.get("sub")
+        return await forward_request(
+            'post',
+            f"{aiml_service_url}/sessions/team/history/update/{session_id}",
+            user_id=user_id,
+            json={
+                "agent_id": agent_id,
+                "role": role,
+                "content": content,
+                "user_id": user_id,
+                "summary": summary
+            }
+        )
+    except Exception as e:
+        log_exception_with_request(e, update_team_session_history_route, request)
+        raise HTTPException(status_code=500, detail=str(e))
