@@ -183,7 +183,7 @@ async def create_team_session_route(
         return await forward_request(
             'post',
             f"{aiml_service_url}/sessions/team/create",
-            json={"agent_ids": agent_ids},  # Only agent_ids in body
+            json=agent_ids,                 # Agent IDs in body
             params={                        # Everything else as query params
                 'max_context_results': max_context_results,
                 'name': name,

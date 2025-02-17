@@ -82,10 +82,13 @@ async def team_chat(
             'include_rich_response': include_rich_response
         }
         
+        # Merge user_id into the JSON body for AIML (aiml expects user_id via Body)
+        body_with_user_id = {**body, "user_id": user_id}
+        
         if stream:
             async def stream_bytes():
                 async with httpx.AsyncClient(timeout=None) as client:
-                    async with client.stream('POST', url, params={**params, "user_id": user_id}, json=body) as response:
+                    async with client.stream('POST', url, params=params, json=body_with_user_id) as response:
                         async for chunk in response.aiter_bytes():
                             yield chunk
             return StreamingResponse(
@@ -93,7 +96,7 @@ async def team_chat(
                 media_type='text/event-stream'
             )
         else:
-            return await forward_request('post', url, user_id=user_id, params=params, json=body)
+            return await forward_request('post', url, user_id=user_id, params=params, json=body_with_user_id)
     except Exception as e:
         log_exception_with_request(e, team_chat, request)
         raise HTTPException(status_code=500, detail=str(e))
