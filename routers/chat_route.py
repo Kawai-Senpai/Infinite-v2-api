@@ -47,7 +47,8 @@ async def chat(
                             yield chunk
             return StreamingResponse(
                 stream_bytes(),
-                media_type='text/event-stream'
+                media_type='text/event-stream',
+                headers={'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no'}
             )
         else:
             return await forward_request('post', url, user_id=user_id, params=params, json=body)
@@ -97,7 +98,8 @@ async def team_chat(
                             yield chunk
             return StreamingResponse(
                 stream_bytes(),
-                media_type='text/event-stream'
+                media_type='text/event-stream',
+                headers={'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no'}
             )
         else:
             response = await forward_request('post', url, params=params, json=request_body)
