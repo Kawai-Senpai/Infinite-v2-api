@@ -28,9 +28,9 @@ Authorization: Bearer <your_jwt_token>
 * **Description:** Creates a new chat session for a single agent. This endpoint is used to initiate a conversation with a specific agent.
 * **Request Parameters:**
     * `agent_id` (required): The ID of the agent. (string)
-    * `max_context_results` (optional): Maximum number of context results. (integer; default: 1). This parameter controls how many relevant context items are fetched for the agent.
+    * `max_context_results` (optional): Maximum number of context results. (integer; default: 1).
     * `name` (optional): The name of the session. (string; default: "Untitled Session")
-* **Request Body:** None (parameters passed via query string)
+* **Request Body:** None
 * **Headers:** `Authorization: Bearer <your_jwt_token>`
 * **Example Request:**
 
@@ -326,34 +326,25 @@ Authorization: Bearer <your_jwt_token>
 
 * **Endpoint:** `POST /team/create`
 * **Description:** Creates a new team chat session for multiple agents.
-* **Request Parameters:** None (data provided in JSON body)
+* **Request Parameters:**
+    * `max_context_results` (optional): Maximum number of context results. (integer; default: 1).
+    * `session_type` (optional): Type of the session. (string; default: "team"). Valid values: "team", "team-managed", "team-flow".
+    * `name` (optional): The name of the session. (string; default: "Untitled Team Session")
 * **Request Body:**
 
     ```json
-    {
-        "agent_ids": ["agent1", "agent2"],
-        "max_context_results": 1,
-        "user_id": "user123",
-        "session_type": "team",  // Other valid values: "team-managed", "team-flow" ; all supported: ["team", "team-managed", "team-flow"]
-        "name": "My Team Session"  // Optional; default: "Untitled Team Session"
-    }
+    ["agent1", "agent2"]
     ```
 
 * **Headers:** `Authorization: Bearer <your_jwt_token>`
 * **Example Request:**
 
     ```
-    POST /team/create
+    POST /team/create?max_context_results=1&session_type=team&name=My%20Team%20Session
     Authorization: Bearer <your_jwt_token>
     Content-Type: application/json
 
-    {
-        "agent_ids": ["agent1", "agent2"],
-        "max_context_results": 1,
-        "user_id": "user123",
-        "session_type": "team",
-        "name": "My Team Session"
-    }
+    ["agent1", "agent2"]
     ```
 
 * **Response:**
