@@ -29,12 +29,13 @@ Authorization: Bearer <your_jwt_token>
 * **Request Parameters:**
     * `agent_id` (required): The ID of the agent. (string)
     * `max_context_results` (optional): Maximum number of context results. (integer; default: 1). This parameter controls how many relevant context items are fetched for the agent.
+    * `name` (optional): The name of the session. (string; default: "Untitled Session")
 * **Request Body:** None (parameters passed via query string)
 * **Headers:** `Authorization: Bearer <your_jwt_token>`
 * **Example Request:**
 
     ```
-    POST /create?agent_id=agent123&max_context_results=3
+    POST /create?agent_id=agent123&max_context_results=3&name=My%20Session
     Authorization: Bearer <your_jwt_token>
     ```
 
@@ -333,7 +334,8 @@ Authorization: Bearer <your_jwt_token>
         "agent_ids": ["agent1", "agent2"],
         "max_context_results": 1,
         "user_id": "user123",
-        "session_type": "team"  // Other valid values: "team-managed", "team-flow" ; all spported: ["team", "team-managed", "team-flow"]
+        "session_type": "team",  // Other valid values: "team-managed", "team-flow" ; all supported: ["team", "team-managed", "team-flow"]
+        "name": "My Team Session"  // Optional; default: "Untitled Team Session"
     }
     ```
 
@@ -349,7 +351,8 @@ Authorization: Bearer <your_jwt_token>
         "agent_ids": ["agent1", "agent2"],
         "max_context_results": 1,
         "user_id": "user123",
-        "session_type": "team"
+        "session_type": "team",
+        "name": "My Team Session"
     }
     ```
 
@@ -458,6 +461,95 @@ Authorization: Bearer <your_jwt_token>
     }
     ```
 
+### 12. List User Team Sessions
+
+* **Endpoint:** `GET /get_all_team`
+* **Description:** Retrieves all team sessions for the authenticated user. The user ID is automatically extracted from the JWT.
+* **Request Parameters:**
+    * `limit` (optional): Maximum number of sessions (default: 20).
+    * `skip` (optional): Number of sessions to skip (default: 0).
+    * `sort_by` (optional): Field to sort by (default: "created_at").
+    * `sort_order` (optional): Sort order (`-1` for descending, `1` for ascending; default: -1).
+* **Headers:** `Authorization: Bearer <your_jwt_token>`
+* **Example Request:**
+
+    ```
+    GET /get_all_team?limit=30
+    Authorization: Bearer <your_jwt_token>
+    ```
+
+* **Response:**
+
+    ```json
+    {
+        "message": "Team sessions retrieved successfully.",
+        "data": [ ... ]
+    }
+    ```
+
+### 13. List User Standalone Sessions
+
+* **Endpoint:** `GET /get_all_standalone`
+* **Description:** Retrieves all standalone (non-team) sessions for the authenticated user. The user ID is automatically extracted from the JWT.
+* **Request Parameters:**
+    * `limit` (optional): Maximum number of sessions (default: 20).
+    * `skip` (optional): Number of sessions to skip (default: 0).
+    * `sort_by` (optional): Field to sort by (default: "created_at").
+    * `sort_order` (optional): Sort order (`-1` for descending, `1` for ascending; default: -1).
+* **Headers:** `Authorization: Bearer <your_jwt_token>`
+* **Example Request:**
+
+    ```
+    GET /get_all_standalone?limit=30
+    Authorization: Bearer <your_jwt_token>
+    ```
+
+* **Response:**
+
+    ```json
+    {
+        "message": "Standalone sessions retrieved successfully.",
+        "data": [ ... ]
+    }
+    ```
+
+### 14. Rename Session
+
+* **Endpoint:** `PUT /rename/{session_id}`
+* **Description:** Updates the name of an existing chat session.
+* **Request Parameters:**
+    * `session_id` (required): The ID of the session to rename (path parameter).
+    * `name` (required): The new name for the session (query parameter).
+* **Headers:** `Authorization: Bearer <your_jwt_token>`
+* **Example Request:**
+
+    ```
+    PUT /rename/session123?name=Updated%20Session%20Name
+    Authorization: Bearer <your_jwt_token>
+    ```
+
+* **Response:**
+
+    ```json
+    {
+        "message": "Session renamed successfully."
+    }
+    ```
+
+* **Example Error Response:**
+
+    ```json
+    {
+        "message": "Failed to rename session.",
+        "error": "Session not found"
+    }
+    ```
+
+## New Features
+
+### Naming Sessions
+When creating a session via `POST /create` or `POST /team/create`, you can include a query parameter `name` to assign a custom name to the session. If not provided, a default name ("Untitled Session" for standalone sessions, "Untitled Team Session" for team sessions) is used.
+
 ## Error Handling
 
 The API returns standard HTTP status codes to indicate the result of a request. Common status codes include:
@@ -483,3 +575,5 @@ Error responses are in the following JSON format:
 * For team sessions, the user creating the session is stored and checked for permissions.
 * The endpoints prefixed with `/team` are designed to handle multi-agent conversations.
 * All request bodies should be sent with `Content-Type: application/json` header.
+
+These new endpoints enable clients to retrieve team and standalone sessions separately.

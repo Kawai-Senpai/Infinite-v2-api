@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Request, Body, Depends
+from fastapi import APIRouter, HTTPException, Request, Body, Depends, Query
 from keys.keys import aiml_service_url
 from dependencies.auth import get_current_user
 from utilities.forward import forward_request
@@ -11,6 +11,7 @@ async def create_session(
     request: Request,
     agent_id: str,
     max_context_results: int = 1,
+    name: str = "Untitled Session",  # Default name
     user: dict = Depends(get_current_user)
 ):
     try:
@@ -19,7 +20,11 @@ async def create_session(
             'post',
             f"{aiml_service_url}/sessions/create",
             user_id=user_id,
-            params={'agent_id': agent_id, 'max_context_results': max_context_results}
+            params={
+                'agent_id': agent_id,
+                'max_context_results': max_context_results,
+                'name': name          # Include name in params
+            }
         )
     except Exception as e:
         log_exception_with_request(e, create_session, request)
@@ -167,22 +172,23 @@ async def get_session_details(
 @router.post("/team/create")
 async def create_team_session_route(
     request: Request,
-    agent_ids: list = Body(...),
-    max_context_results: int = 1,
-    user: dict = Depends(get_current_user),
-    session_type: str = "team"
+    agent_ids: list = Body(...),    # This stays in body
+    name: str = "Untitled Team Session",  # Default name
+    max_context_results: int = 1,   # Query parameter
+    session_type: str = "team",     # Query parameter
+    user: dict = Depends(get_current_user)
 ):
     try:
         user_id = user.get("sub")
         return await forward_request(
             'post',
             f"{aiml_service_url}/sessions/team/create",
-            user_id=user_id,
-            json={
-                "agent_ids": agent_ids,
-                "max_context_results": max_context_results,
-                "user_id": user_id,
-                "session_type": session_type
+            json={"agent_ids": agent_ids},  # Only agent_ids in body
+            params={                        # Everything else as query params
+                'max_context_results': max_context_results,
+                'name': name,
+                'user_id': user_id,
+                'session_type': session_type
             }
         )
     except Exception as e:
@@ -235,4 +241,61 @@ async def update_team_session_history_route(
         )
     except Exception as e:
         log_exception_with_request(e, update_team_session_history_route, request)
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/get_all_team")
+async def list_user_team_sessions(
+    request: Request,
+    limit: int = 20,
+    skip: int = 0,
+    sort_by: str = Query("created_at"),
+    sort_order: int = Query(-1),
+    user: dict = Depends(get_current_user)
+):
+    try:
+        user_id = user.get("sub")
+        return await forward_request(
+            'get',
+            f"{aiml_service_url}/sessions/get_all_team/{user_id}",
+            params={'limit': limit, 'skip': skip, 'sort_by': sort_by, 'sort_order': sort_order}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail={"message": "Error retrieving team sessions", "error": str(e)})
+
+@router.get("/get_all_standalone")
+async def list_user_standalone_sessions(
+    request: Request,
+    limit: int = 20,
+    skip: int = 0,
+    sort_by: str = Query("created_at"),
+    sort_order: int = Query(-1),
+    user: dict = Depends(get_current_user)
+):
+    try:
+        user_id = user.get("sub")
+        return await forward_request(
+            'get',
+            f"{aiml_service_url}/sessions/get_all_standalone/{user_id}",
+            params={'limit': limit, 'skip': skip, 'sort_by': sort_by, 'sort_order': sort_order}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail={"message": "Error retrieving standalone sessions", "error": str(e)})
+
+@router.put("/rename/{session_id}")
+async def rename_session(
+    request: Request,
+    session_id: str,
+    name: str,            # Name as query parameter
+    user: dict = Depends(get_current_user)
+):
+    try:
+        user_id = user.get("sub")
+        return await forward_request(
+            'put',
+            f"{aiml_service_url}/sessions/rename/{session_id}",
+            user_id=user_id,
+            params={'name': name}
+        )
+    except Exception as e:
+        log_exception_with_request(e, rename_session, request)
         raise HTTPException(status_code=500, detail=str(e))
