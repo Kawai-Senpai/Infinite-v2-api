@@ -25,10 +25,10 @@ Authorization: Bearer <your_jwt_token>
 ### 1. Create Session
 
 * **Endpoint:** `POST /create`
-* **Description:** Creates a new chat session for a single agent.
+* **Description:** Creates a new chat session for a single agent. This endpoint is used to initiate a conversation with a specific agent.
 * **Request Parameters:**
     * `agent_id` (required): The ID of the agent. (string)
-    * `max_context_results` (optional): Maximum number of context results. (integer; default: 1)
+    * `max_context_results` (optional): Maximum number of context results. (integer; default: 1). This parameter controls how many relevant context items are fetched for the agent.
 * **Request Body:** None (parameters passed via query string)
 * **Headers:** `Authorization: Bearer <your_jwt_token>`
 * **Example Request:**
@@ -47,10 +47,18 @@ Authorization: Bearer <your_jwt_token>
     }
     ```
 
+* **Example Error Response:**
+    ```json
+    {
+        "message": "Agent ID is required",
+        "error": "missing_agent_id"
+    }
+    ```
+
 ### 2. Delete Session
 
 * **Endpoint:** `DELETE /delete/{session_id}`
-* **Description:** Deletes an existing chat session.
+* **Description:** Deletes an existing chat session. This will remove all associated history and data for the session.
 * **Request Parameters:**
     * `session_id` (required): The ID of the session to delete. (string; path parameter)
 * **Request Body:** None
@@ -67,6 +75,14 @@ Authorization: Bearer <your_jwt_token>
     ```json
     {
         "message": "Chat session deleted successfully."
+    }
+    ```
+
+* **Example Error Response:**
+    ```json
+    {
+        "message": "Session not found",
+        "error": "session_not_found"
     }
     ```
 
@@ -98,6 +114,14 @@ Authorization: Bearer <your_jwt_token>
             "skip": 10,
             "limit": 50
         }
+    }
+    ```
+
+* **Example Error Response:**
+     ```json
+    {
+        "message": "Session not found",
+        "error": "session_not_found"
     }
     ```
 
@@ -137,6 +161,14 @@ Authorization: Bearer <your_jwt_token>
         "message": "Session history updated successfully."
     }
     ```
+* **Example Error Response:**
+
+    ```json
+    {
+        "message": "Invalid role. Must be 'user' or 'assistant'.",
+        "error": "invalid_role"
+    }
+    ```
 
 ### 5. Get Recent Session History
 
@@ -169,6 +201,14 @@ Authorization: Bearer <your_jwt_token>
     }
     ```
 
+* **Example Error Response:**
+    ```json
+    {
+        "message": "Session not found",
+        "error": "session_not_found"
+    }
+    ```
+
 ### 6. List User Sessions
 
 * **Endpoint:** `GET /get_all/{user_id}`
@@ -197,6 +237,14 @@ Authorization: Bearer <your_jwt_token>
     }
     ```
 
+* **Example Error Response:**
+    ```json
+    {
+        "message": "User ID is required",
+        "error": "missing_user_id"
+    }
+    ```
+
 ### 7. List Agent Sessions
 
 * **Endpoint:** `GET /get_by_agent/{agent_id}`
@@ -222,6 +270,14 @@ Authorization: Bearer <your_jwt_token>
     {
         "message": "Agent sessions retrieved successfully.",
         "data": [ ... ]
+    }
+    ```
+
+* **Example Error Response:**
+    ```json
+    {
+        "message": "Agent ID is required",
+        "error": "missing_agent_id"
     }
     ```
 
@@ -254,6 +310,14 @@ Authorization: Bearer <your_jwt_token>
             "created_at": "2024-01-01",
             "history": [ ... ]
         }
+    }
+    ```
+
+* **Example Error Response:**
+    ```json
+    {
+        "message": "Session not found",
+        "error": "session_not_found"
     }
     ```
 
@@ -298,6 +362,14 @@ Authorization: Bearer <your_jwt_token>
     }
     ```
 
+* **Example Error Response:**
+    ```json
+    {
+        "message": "Agent IDs are required",
+        "error": "missing_agent_ids"
+    }
+    ```
+
 ### 10. Get Team Session History
 
 * **Endpoint:** `GET /team/history/{session_id}`
@@ -326,6 +398,14 @@ Authorization: Bearer <your_jwt_token>
             "skip": 0,
             "limit": 30
         }
+    }
+    ```
+
+* **Example Error Response:**
+    ```json
+    {
+        "message": "Session not found",
+        "error": "session_not_found"
     }
     ```
 
@@ -370,6 +450,14 @@ Authorization: Bearer <your_jwt_token>
     }
     ```
 
+* **Example Error Response:**
+    ```json
+    {
+        "message": "Invalid role. Must be 'user' or 'assistant'.",
+        "error": "invalid_role"
+    }
+    ```
+
 ## Error Handling
 
 The API returns standard HTTP status codes to indicate the result of a request. Common status codes include:
@@ -394,3 +482,4 @@ Error responses are in the following JSON format:
 * Ensure that ObjectId conversions are properly handled on the backend.
 * For team sessions, the user creating the session is stored and checked for permissions.
 * The endpoints prefixed with `/team` are designed to handle multi-agent conversations.
+* All request bodies should be sent with `Content-Type: application/json` header.

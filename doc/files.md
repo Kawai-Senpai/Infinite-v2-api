@@ -40,7 +40,7 @@ Authorization: Bearer <your_jwt_token>
 ### Generate Upload URL
 `POST /files/upload/generate_url`
 
-Generates a pre-signed S3 URL for file upload with validation checks.
+Generates a pre-signed S3 URL for file upload with validation checks. This URL is used to directly upload the file to the S3 bucket.
 
 #### Query Parameters
 - `file_name` (required): Name of the file to upload
@@ -143,6 +143,12 @@ Retrieves all files associated with an agent.
 }
 ```
 
+The `data` array contains objects with the following properties:
+- `id`: Unique identifier for the file
+- `filename`: Name of the file
+- `file_type`: Type of the file (e.g., pdf, txt, doc, docx, webpage)
+- `uploaded_at`: Timestamp of when the file was uploaded
+
 ### List Collections
 `GET /files/collections/{agent_id}`
 
@@ -184,6 +190,12 @@ Retrieves all files in a specific collection.
     ]
 }
 ```
+
+The `data` array contains objects with the following properties:
+- `id`: Unique identifier for the file
+- `filename`: Name of the file
+- `file_type`: Type of the file (e.g., pdf, txt, doc, docx, webpage)
+- `uploaded_at`: Timestamp of when the file was uploaded
 
 ### Validate File
 `POST /files/validate`
@@ -299,11 +311,14 @@ Common status codes:
 3. Client initiates processing via `/files/process`
 4. Server processes file (chunking, embedding, etc.)
 5. File becomes available for use in the agent's knowledge base
+6. Client can check the status of the processing job via `/files/jobs/{job_id}`
+7. Once processing is complete, the file can be downloaded or used in the agent's knowledge base
 
 ## Security Considerations
 
 - All endpoints require authentication
-- File types are strictly validated
-- File sizes are limited
-- S3 pre-signed URLs expire quickly
-- User permissions are checked for all operations
+- File types are strictly validated to prevent malicious files
+- File sizes are limited to prevent abuse
+- S3 pre-signed URLs expire quickly to minimize the risk of unauthorized access
+- User permissions are checked for all operations to ensure that users can only access their own files
+- All data is encrypted in transit and at rest

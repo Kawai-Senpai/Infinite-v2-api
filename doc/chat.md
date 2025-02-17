@@ -140,6 +140,12 @@ The mode is determined by the session's type, which is set when creating the tea
 
 ### Request Body
 
+The request body must be a JSON object containing the following field:
+
+-   `message` (required): The message to be sent to the AI agent. This cannot be empty or consist only of whitespace.
+
+Example:
+
 ```json
 {
     "message": "Your message here"
@@ -214,6 +220,17 @@ The streaming response is formatted as text/event-stream with the following stru
 - Has a maximum step limit to prevent infinite loops
 - Ends with a summary
 
+### Important Notes
+1. Session type is determined during session creation using create_team_session with one of these types:
+   - "team": Basic sequential team chat
+   - "team-managed": Managed team chat with smart agent ordering
+   - "team-flow": Dynamic flow-based team chat
+2. The session type cannot be changed after creation
+3. Each type has different behavior:
+   - team: Sequential responses from all agents
+   - team-managed: Order determined by analyzing message context
+   - team-flow: Dynamic agent selection with max 50 steps
+
 ### Error Responses
 
 ```json
@@ -225,6 +242,18 @@ The streaming response is formatted as text/event-stream with the following stru
 ```json
 {
     "detail": "Not a team session"
+}
+```
+
+```json
+{
+    "detail": "Invalid session type"
+}
+```
+
+```json
+{
+    "detail": "Message is required and cannot be empty"
 }
 ```
 
