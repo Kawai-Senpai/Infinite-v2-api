@@ -416,7 +416,7 @@ Authorization: Bearer <your_jwt_token>
 
 * **URL:** `/agents/search`
 * **Method:** `GET`
-* **Description:** Searches among public, approved, and system agents based on a query matching the agent’s name, role, capabilities, or rules.
+* **Description:** Searches among public, approved, and system agents based on a query matching the agent’s name, role, capabilities, or rules. Note that private agents are always excluded even if “private” is passed as a query parameter.
 
     **Headers:**
     * `Authorization`: Required. JWT token for authentication.
@@ -425,6 +425,9 @@ Authorization: Bearer <your_jwt_token>
     * `query` (string): Required. The search term.
     * `limit` (integer): Optional. The maximum number of results to return. Default: 20.
     * `skip` (integer): Optional. The number of results to skip. Default: 0.
+    * `types` (array of strings): Optional. Agent types to filter (e.g., "public", "approved", "system"). If omitted or empty, defaults to these three. The "private" type is always ignored.
+    * `sort_by` (string): Optional. Field to sort results by (e.g., "created_at"). Default: "created_at".
+    * `sort_order` (integer): Optional. Sort order (-1 for descending, 1 for ascending). Default: -1.
 
     **Response (Success):**
     ```json
