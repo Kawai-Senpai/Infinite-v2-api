@@ -72,7 +72,10 @@ async def team_chat(
         if not session_doc:
             raise HTTPException(status_code=404, detail="Session not found")
         
-        if not session_doc.get("session_type", "").startswith("team"):
+        # Debug: log the trimmed session_type value
+        session_type = session_doc.get("session_type", "").strip().lower()
+        
+        if not session_type.startswith("team"):
             raise HTTPException(status_code=400, detail="Not a team session")
 
         user_id = user.get("sub")

@@ -27,7 +27,7 @@ Authorization: Bearer <your_jwt_token>
     *   `Authorization`: Required. JWT token for authentication.
 
     **Query Parameters:**
-    *   `agent_type` (string): Required. The type of agent to create (e.g., "system", "user").
+    *   `agent_type` (string): Required. The type of agent to create ["public", "private"]
     *   `name` (string): Required. The name of the agent.
 
     **Request Body (JSON):**
