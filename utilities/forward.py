@@ -8,7 +8,7 @@ async def forward_request(method: str, url: str, user_id: str = None, **kwargs):
     """
     A shared method to forward an HTTP request to the AIML service.
     """
-    MAX_RETRIES = 3  # new constant
+    MAX_RETRIES = 5  # new constant
     DELAY_SECONDS = 1  # new constant
 
     # If user_id is provided, add it to params
@@ -17,9 +17,12 @@ async def forward_request(method: str, url: str, user_id: str = None, **kwargs):
             kwargs['params'] = {}
         kwargs['params']['user_id'] = user_id
 
+    # Use a custom timeout with read disabled:
+    custom_timeout = httpx.Timeout(connect=60.0, read=None, write=60.0, pool=60.0)
+
     for attempt in range(MAX_RETRIES):
         try:
-            async with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient(timeout=custom_timeout) as client:  # Disable timeouts, wait forever
                 response = await getattr(client, method)(url, **kwargs)
                 response.raise_for_status()
                 # Check if the response content is empty
