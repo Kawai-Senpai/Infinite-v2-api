@@ -1,5 +1,4 @@
 from fastapi import APIRouter, HTTPException, Request, Body, Query, Depends
-from fastapi.responses import JSONResponse
 from keys.keys import aiml_service_url
 from dependencies.auth import get_current_user
 from utilities.forward import forward_request
@@ -182,3 +181,17 @@ async def update_agent(
             "message": "Internal Server Error while updating agent.",
             "error": str(e)
         })
+
+@router.get("/search")
+async def search_agent(
+    request: Request,
+    query: str = Query(..., description="Search term for agent names, capabilities or rules"),
+    limit: int = 20,
+    skip: int = 0,
+    user: dict = Depends(get_current_user)
+):
+    return await forward_request(
+        'get',
+        f"{aiml_service_url}/agents/search",
+        params={'query': query, 'limit': limit, 'skip': skip}
+    )

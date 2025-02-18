@@ -411,3 +411,43 @@ Authorization: Bearer <your_jwt_token>
     - "Can only change agent type to private."
     - "Not authorized to update this agent."
     - "Agent not found."
+
+### 11. Search Agents
+
+* **URL:** `/agents/search`
+* **Method:** `GET`
+* **Description:** Searches among public, approved, and system agents based on a query matching the agent’s name, role, capabilities, or rules.
+
+    **Headers:**
+    * `Authorization`: Required. JWT token for authentication.
+
+    **Query Parameters:**
+    * `query` (string): Required. The search term.
+    * `limit` (integer): Optional. The maximum number of results to return. Default: 20.
+    * `skip` (integer): Optional. The number of results to skip. Default: 0.
+
+    **Response (Success):**
+    ```json
+    {
+        "message": "Agents retrieved successfully.",
+        "data": [
+            {
+                "id": "string",
+                "name": "string",
+                "role": "string",
+                "agent_type": "string",
+                "created_at": "string",
+                "updated_at": "string"
+                // ... other agent properties
+            }
+        ]
+    }
+    ```
+
+    **Response (Error):**
+    ```json
+    {
+        "message": "Internal Server Error while searching agents.",
+        "error": "string"
+    }
+    ```
