@@ -39,8 +39,16 @@ async def get_public_agents(
     sort_order: int = Query(-1),
     user: dict = Depends(get_current_user)
 ):
-    return await forward_request('get', f"{aiml_service_url}/agents/get_public",
-        params={'limit': limit, 'skip': skip, 'sort_by': sort_by, 'sort_order': sort_order}
+    return await forward_request(
+        'get', 
+        f"{aiml_service_url}/agents/get_public",
+        params={
+            'limit': limit, 
+            'skip': skip, 
+            'sort_by': sort_by, 
+            'sort_order': sort_order,
+            'user_id': user.get('sub')  # Add user_id to params
+        }
     )
 
 @router.delete("/delete/{agent_id}")
@@ -63,8 +71,16 @@ async def get_approved_agents(
     sort_order: int = Query(-1),
     user: dict = Depends(get_current_user)
 ):
-    return await forward_request('get', f"{aiml_service_url}/agents/get_approved",
-        params={'limit': limit, 'skip': skip, 'sort_by': sort_by, 'sort_order': sort_order}
+    return await forward_request(
+        'get', 
+        f"{aiml_service_url}/agents/get_approved",
+        params={
+            'limit': limit, 
+            'skip': skip, 
+            'sort_by': sort_by, 
+            'sort_order': sort_order,
+            'user_id': user.get('sub')  # Add user_id to params
+        }
     )
 
 @router.get("/get_system")
@@ -76,8 +92,16 @@ async def get_system_agents(
     sort_order: int = Query(-1),
     user: dict = Depends(get_current_user)
 ):
-    return await forward_request('get', f"{aiml_service_url}/agents/get_system",
-        params={'limit': limit, 'skip': skip, 'sort_by': sort_by, 'sort_order': sort_order}
+    return await forward_request(
+        'get', 
+        f"{aiml_service_url}/agents/get_system",
+        params={
+            'limit': limit, 
+            'skip': skip, 
+            'sort_by': sort_by, 
+            'sort_order': sort_order,
+            'user_id': user.get('sub')  # Add user_id to params
+        }
     )
 
 @router.get("/get_user_agents/{user_id}")
@@ -202,6 +226,7 @@ async def search_agent(
             'skip': skip,
             'types': types,
             'sort_by': sort_by,
-            'sort_order': sort_order
+            'sort_order': sort_order,
+            'user_id': user.get('sub')  # Add user_id to params
         }
     )
