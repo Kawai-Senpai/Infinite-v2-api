@@ -260,6 +260,7 @@ async def list_user_team_sessions(
             params={'limit': limit, 'skip': skip, 'sort_by': sort_by, 'sort_order': sort_order}
         )
     except Exception as e:
+        log_exception_with_request(e, list_user_team_sessions, request)
         raise HTTPException(status_code=500, detail={"message": "Error retrieving team sessions", "error": str(e)})
 
 @router.get("/get_all_standalone")
@@ -279,6 +280,7 @@ async def list_user_standalone_sessions(
             params={'limit': limit, 'skip': skip, 'sort_by': sort_by, 'sort_order': sort_order}
         )
     except Exception as e:
+        log_exception_with_request(e, list_user_standalone_sessions, request)
         raise HTTPException(status_code=500, detail={"message": "Error retrieving standalone sessions", "error": str(e)})
 
 @router.put("/rename/{session_id}")

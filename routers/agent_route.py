@@ -2,6 +2,8 @@ from fastapi import APIRouter, HTTPException, Request, Body, Query, Depends
 from keys.keys import aiml_service_url
 from dependencies.auth import get_current_user
 from utilities.forward import forward_request
+from errors.error_logger import log_exception_with_request
+from utilities.error_handler import handle_request_error
 
 router = APIRouter()
 
@@ -13,22 +15,25 @@ async def create_agent(
     body: dict = Body(...),  # Make this required since the other API expects it
     user: dict = Depends(get_current_user)
 ):
-    valid_agent_types = ["public", "private"]
-    if agent_type not in valid_agent_types:
-        raise HTTPException(status_code=403, detail={
-            "message": "Invalid agent type. Only public and private agents can be created.",
-            "error": "Unauthorized agent type"
-        })
+    try:
+        valid_agent_types = ["public", "private"]
+        if agent_type not in valid_agent_types:
+            raise HTTPException(status_code=403, detail={
+                "message": "Invalid agent type. Only public and private agents can be created.",
+                "error": "Unauthorized agent type"
+            })
 
-    user_id = user.get("sub")
-    # The other API expects user_id as a query parameter, not in the body
-    url_params = {
-        "user_id": user_id,
-        "agent_type": agent_type,
-        "name": name
-    }
-    # Change from '/agents/create' to '/agent/create' to match the other server's API
-    return await forward_request('post', f"{aiml_service_url}/agents/create", params=url_params, json=body)
+        user_id = user.get("sub")
+        # The other API expects user_id as a query parameter, not in the body
+        url_params = {
+            "user_id": user_id,
+            "agent_type": agent_type,
+            "name": name
+        }
+        # Change from '/agents/create' to '/agent/create' to match the other server's API
+        return await forward_request('post', f"{aiml_service_url}/agents/create", params=url_params, json=body)
+    except Exception as e:
+        await handle_request_error(e, create_agent, request)
 
 @router.get("/get_public")
 async def get_public_agents(
@@ -39,17 +44,20 @@ async def get_public_agents(
     sort_order: int = Query(-1),
     user: dict = Depends(get_current_user)
 ):
-    return await forward_request(
-        'get', 
-        f"{aiml_service_url}/agents/get_public",
-        params={
-            'limit': limit, 
-            'skip': skip, 
-            'sort_by': sort_by, 
-            'sort_order': sort_order,
-            'user_id': user.get('sub')  # Add user_id to params
-        }
-    )
+    try:
+        return await forward_request(
+            'get', 
+            f"{aiml_service_url}/agents/get_public",
+            params={
+                'limit': limit, 
+                'skip': skip, 
+                'sort_by': sort_by, 
+                'sort_order': sort_order,
+                'user_id': user.get('sub')  # Add user_id to params
+            }
+        )
+    except Exception as e:
+        await handle_request_error(e, get_public_agents, request)
 
 @router.delete("/delete/{agent_id}")
 async def delete_agent(
@@ -57,10 +65,13 @@ async def delete_agent(
     agent_id: str = None,
     user: dict = Depends(get_current_user)
 ):
-    user_id = user.get("sub")
-    return await forward_request('delete', f"{aiml_service_url}/agents/delete/{agent_id}",
-        user_id=user_id
-    )
+    try:
+        user_id = user.get("sub")
+        return await forward_request('delete', f"{aiml_service_url}/agents/delete/{agent_id}",
+            user_id=user_id
+        )
+    except Exception as e:
+        await handle_request_error(e, delete_agent, request)
 
 @router.get("/get_approved")
 async def get_approved_agents(
@@ -71,17 +82,20 @@ async def get_approved_agents(
     sort_order: int = Query(-1),
     user: dict = Depends(get_current_user)
 ):
-    return await forward_request(
-        'get', 
-        f"{aiml_service_url}/agents/get_approved",
-        params={
-            'limit': limit, 
-            'skip': skip, 
-            'sort_by': sort_by, 
-            'sort_order': sort_order,
-            'user_id': user.get('sub')  # Add user_id to params
-        }
-    )
+    try:
+        return await forward_request(
+            'get', 
+            f"{aiml_service_url}/agents/get_approved",
+            params={
+                'limit': limit, 
+                'skip': skip, 
+                'sort_by': sort_by, 
+                'sort_order': sort_order,
+                'user_id': user.get('sub')  # Add user_id to params
+            }
+        )
+    except Exception as e:
+        await handle_request_error(e, get_approved_agents, request)
 
 @router.get("/get_system")
 async def get_system_agents(
@@ -92,17 +106,20 @@ async def get_system_agents(
     sort_order: int = Query(-1),
     user: dict = Depends(get_current_user)
 ):
-    return await forward_request(
-        'get', 
-        f"{aiml_service_url}/agents/get_system",
-        params={
-            'limit': limit, 
-            'skip': skip, 
-            'sort_by': sort_by, 
-            'sort_order': sort_order,
-            'user_id': user.get('sub')  # Add user_id to params
-        }
-    )
+    try:
+        return await forward_request(
+            'get', 
+            f"{aiml_service_url}/agents/get_system",
+            params={
+                'limit': limit, 
+                'skip': skip, 
+                'sort_by': sort_by, 
+                'sort_order': sort_order,
+                'user_id': user.get('sub')  # Add user_id to params
+            }
+        )
+    except Exception as e:
+        await handle_request_error(e, get_system_agents, request)
 
 @router.get("/get_user_agents/{user_id}")
 async def get_user_agents(
@@ -114,9 +131,12 @@ async def get_user_agents(
     sort_order: int = -1,
     user: dict = Depends(get_current_user)
 ):
-    return await forward_request('get', f"{aiml_service_url}/agents/get_user_nonprivate/{user_id}",
-        params={'limit': limit, 'skip': skip, 'sort_by': sort_by, 'sort_order': sort_order}
-    )
+    try:
+        return await forward_request('get', f"{aiml_service_url}/agents/get_user_nonprivate/{user_id}",
+            params={'limit': limit, 'skip': skip, 'sort_by': sort_by, 'sort_order': sort_order}
+        )
+    except Exception as e:
+        await handle_request_error(e, get_user_agents, request)
 
 @router.get("/get_own")
 async def get_private_agents(
@@ -127,11 +147,14 @@ async def get_private_agents(
     sort_order: int = Query(-1),
     user: dict = Depends(get_current_user)
 ):
-    user_id = user.get("sub")
-    return await forward_request('get', f"{aiml_service_url}/agents/get_user/{user_id}",
-        params={'limit': limit, 'skip': skip, 'sort_by': sort_by, 'sort_order': sort_order},
-        user_id=user_id
-    )
+    try:
+        user_id = user.get("sub")
+        return await forward_request('get', f"{aiml_service_url}/agents/get_user/{user_id}",
+            params={'limit': limit, 'skip': skip, 'sort_by': sort_by, 'sort_order': sort_order},
+            user_id=user_id
+        )
+    except Exception as e:
+        await handle_request_error(e, get_private_agents, request)
 
 @router.get("/get/{agent_id}")
 async def get_agent_details(
@@ -139,18 +162,24 @@ async def get_agent_details(
     agent_id: str,
     user: dict = Depends(get_current_user)
 ):
-    return await forward_request('get', f"{aiml_service_url}/agents/get/{agent_id}",
-        user_id=user.get('sub')
-    )
+    try:
+        return await forward_request('get', f"{aiml_service_url}/agents/get/{agent_id}",
+            user_id=user.get('sub')
+        )
+    except Exception as e:
+        await handle_request_error(e, get_agent_details, request)
 
 @router.get("/tools")
 async def get_available_tools(
     request: Request = None,
     user: dict = Depends(get_current_user)
 ):
-    return await forward_request('get', f"{aiml_service_url}/agents/tools",
-        user_id=user.get('sub')
-    )
+    try:
+        return await forward_request('get', f"{aiml_service_url}/agents/tools",
+            user_id=user.get('sub')
+        )
+    except Exception as e:
+        await handle_request_error(e, get_available_tools, request)
 
 @router.put("/update/{agent_id}")
 async def update_agent(
@@ -201,10 +230,7 @@ async def update_agent(
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail={
-            "message": "Internal Server Error while updating agent.",
-            "error": str(e)
-        })
+        await handle_request_error(e, update_agent, request)
 
 @router.get("/search")
 async def search_agent(
@@ -217,16 +243,19 @@ async def search_agent(
     sort_order: int = Query(-1, description="Sort order (-1 for descending, 1 for ascending)"),
     user: dict = Depends(get_current_user)
 ):
-    return await forward_request(
-        'get',
-        f"{aiml_service_url}/agents/search",
-        params={
-            'query': query,
-            'limit': limit,
-            'skip': skip,
-            'types': types,
-            'sort_by': sort_by,
-            'sort_order': sort_order,
-            'user_id': user.get('sub')  # Add user_id to params
-        }
-    )
+    try:
+        return await forward_request(
+            'get',
+            f"{aiml_service_url}/agents/search",
+            params={
+                'query': query,
+                'limit': limit,
+                'skip': skip,
+                'types': types,
+                'sort_by': sort_by,
+                'sort_order': sort_order,
+                'user_id': user.get('sub')  # Add user_id to params
+            }
+        )
+    except Exception as e:
+        await handle_request_error(e, search_agent, request)
